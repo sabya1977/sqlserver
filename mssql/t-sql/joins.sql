@@ -109,7 +109,8 @@ LEFT OUTER JOIN
 ON C.custid = O.custid
 WHERE C.country = 'India';
 --
--- The next problem is to find out the dates on which no order has been placed
+-- Finding missing values in a temporal table
+-- The next problem is to find out the dates on which no order has been placed.
 --
 -- To achieve this solution we will have a number table which we will use
 -- to generate all dates (in a specified range) and left join the result 
@@ -125,12 +126,40 @@ FROM
 	TSQLV6.dbo.Nums
 ORDER BY orderdate;
 --
+-- The below query will add each number, starting 0 (first number - 1 from Nums)
+-- till the number derived from DATEDIFF between 20200101 and 20221231.
+-- In other words, it will generate all dates between 01/01/2020 and 12/31/2022
+--
 SELECT 
-	DATEADD(day, n, CAST('20200101' AS DATE)) AS orderdate
+	DATEADD(day, n-1, CAST('20200101' AS DATE)) AS orderdate
 FROM 
 	TSQLV6.dbo.Nums
-WHERE n <= DATEDIFF(day, '20200101', '20221231')
+WHERE n <= DATEDIFF(day, '20200101', '20221231') + 1
 ORDER BY orderdate;
+--
+-- The below query will show all the dates in which at least one order 
+-- is place as well as the dates when no order was placed at all.
+--
+WITH Dummy AS
+(
+SELECT 
+	DATEADD(day, n-1, CAST('20200101' AS DATE)) AS orderdate
+FROM 
+	TSQLV6.dbo.Nums
+WHERE n <= DATEDIFF(day, '20200101', '20221231') + 1
+)
+SELECT
+	O.orderid,
+	O.custid,
+	O.empid,
+	D.orderdate
+FROM
+	Dummy D
+LEFT OUTER JOIN
+	TSQLV6.Sales.Orders O
+ON D.orderdate = O.orderdate
+ORDER BY D.orderdate;
+
 
 
 
