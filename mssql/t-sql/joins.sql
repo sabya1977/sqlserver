@@ -159,14 +159,114 @@ LEFT OUTER JOIN
 	TSQLV6.Sales.Orders O
 ON D.orderdate = O.orderdate
 ORDER BY D.orderdate;
+--
+-- Filtering non-preserved table rows in WHERE clause.
+-- In the below query, the non-preserved table is filtered 
+-- out hence the non-matching rows from the preserved table 
+-- are all filtered out making OUTER JOIN meaningless
+--
+SELECT 
+	C.custid, 
+	C.companyname, 
+	O.orderid, 
+	O.orderdate
+FROM 
+	TSQLV6.Sales.Customers AS C
+LEFT OUTER JOIN 
+	TSQLV6.Sales.Orders AS O
+ON C.custid = O.custid
+WHERE O.shipcountry = 'India';
+--
+-- Outer join with Inner join:
+-- Suppose you write a multi-join query with an outer join 
+-- between two tables, followed by an inner join with a third
+-- table. 
+--
+-- Issue: In the below query, Customer table is outer joined with Orders table
+-- For custid 22, 57, 92, and 93, the orderid returns NULL from Orders 
+-- table because these customers didn't place any orders.
+-- This result set is then INNER Joined with OrderDetails table on
+-- orderid but since orderid is NULL for these custid, NULL = OD.orderid
+-- returns UKNOWN and consequently eliminated from the final result.
+--
+SELECT 
+	C.custid, 
+	O.orderid, 
+	OD.productid, 
+	OD.qty
+FROM 
+	TSQLV6.Sales.Customers AS C
+LEFT OUTER JOIN 
+	TSQLV6.Sales.Orders AS O
+ON C.custid = O.custid
+INNER JOIN 
+	TSQLV6.Sales.OrderDetails AS OD
+ON O.orderid = OD.orderid
+WHERE C.custid IN (22, 57, 93, 92, 94);
+--
+-- Solution 1: Use LEFT OUTER JOIN for all tables.
+--
+SELECT 
+	C.custid, 
+	O.orderid, 
+	OD.productid,
+	O.shippeddate,
+	O.shipname,
+	OD.qty
+FROM 
+	TSQLV6.Sales.Customers AS C
+LEFT OUTER JOIN 
+	TSQLV6.Sales.Orders AS O
+ON C.custid = O.custid
+LEFT OUTER JOIN  
+	TSQLV6.Sales.OrderDetails AS OD
+ON O.orderid = OD.orderid
+WHERE C.custid IN (22, 57, 93, 92, 94);
+--
+-- Solution 2: If you want to discard a row if it does not have any order details
+--
+SELECT 
+	C.custid, 
+	O.orderid, 
+	OD.productid,
+	O.shippeddate,
+	O.shipname,
+	OD.qty
+FROM 
+	TSQLV6.Sales.Orders AS O
+INNER JOIN
+	TSQLV6.Sales.OrderDetails AS OD
+ON O.orderid = OD.orderid
+RIGHT OUTER JOIN
+	TSQLV6.Sales.Customers AS C
+ON C.custid = O.custid
+WHERE C.custid IN (22, 57, 93, 92, 94);
+--
+-- Write a query that returns all customers, but matches them with their respective orders
+-- only if they were placed on February 12, 2022:
+--
+SELECT 
+	C.custid,
+	C.companyname,
+	O.orderid,
+	O.orderdate,
+	CASE 
+		WHEN o.orderid IS NULL THEN
+			'No'
+		ELSE
+			'Yes'
+	END AS HasOrderOn20220212
+FROM 
+	TSQLV6.Sales.Customers C
+LEFT OUTER JOIN
+	TSQLV6.Sales.Orders O
+ON C.custid = O.custid AND O.orderdate = CAST ('2022-02-12' AS date)
 
 
-
-
-
-
-
-SELECT * FROM TSQLV6.Sales.Orders;
+SELECT * FROM TSQLV6.Sales.Orders WHERE orderid = 11078;
+--
+SELECT * FROM TSQLV6.Sales.OrderDetails WHERE orderid = 11078;
 --
 SELECT * FROM TSQLV6.Sales.Customers;
-
+--
+SELECT CAST ('2022-02-12' AS date)
