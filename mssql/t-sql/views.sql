@@ -121,3 +121,90 @@ city, region, postalcode, country, phone, fax)
 VALUES ('China Shipping', 'Shipping Office', 'China Shipping Corp.', 'Shanghai',
 'Shanghai', NULL, '12345', 'CN', '86-3456789', '86-3456789');
 --
+-- SCHEMABINDING option : Does not allow the underlying table or columns to be dropped 
+--
+-- create a new table from existing Customer table
+--
+SELECT * INTO Sales.Cust
+FROM Sales.Customers;
+--
+-- create the view
+--
+CREATE OR ALTER VIEW Sales.USCust
+AS
+SELECT 
+	custid, 
+	companyname, 
+	contactname, 
+	contacttitle, 
+	address,
+	city, 
+	region, 
+	postalcode, 
+	country, 
+	phone, 
+	fax
+FROM 
+	Sales.Cust
+WHERE country = 'USA';
+--
+-- table is dropped without error
+--
+DROP TABLE SAles.Cust;
+--
+-- create view with SCHEMABINDING option
+--
+CREATE OR ALTER VIEW Sales.USCust
+WITH SCHEMABINDING
+AS
+SELECT 
+	custid, 
+	companyname, 
+	contactname, 
+	contacttitle, 
+	address,
+	city, 
+	region, 
+	postalcode, 
+	country, 
+	phone, 
+	fax
+FROM 
+	Sales.Cust
+WHERE country = 'USA';
+-- 
+-- try to drop a column from the table; it gives an error.
+--
+ALTER TABLE Sales.Cust DROP address;
+--
+-- ENCRYPTION Option : When you create a db objects such as 
+-- stored procedure, UDF, views or triigers with ENCRYPTION
+-- SQL Server stores the text of the definition in obfuscated
+-- format.
+--
+-- to see a view in catalog
+USE TSQLV6;
+SELECT OBJECT_DEFINITION(OBJECT_ID('Sales.USCust')) AS TEXT;
+--
+CREATE OR ALTER VIEW Sales.USCust WITH ENCRYPTION
+AS
+SELECT 
+	custid, 
+	companyname, 
+	contactname, 
+	contacttitle, 
+	address,
+	city, 
+	region, 
+	postalcode, 
+	country, 
+	phone, 
+	fax
+FROM 
+	Sales.Cust
+WHERE country = 'USA';
+--
+-- the statement will return NULL
+--
+SELECT OBJECT_DEFINITION(OBJECT_ID('Sales.USCust')) AS TEXT;
+--
