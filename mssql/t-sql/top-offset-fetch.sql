@@ -1,7 +1,7 @@
 -- SQL Server views
 -- Author: Sabyasachi Mitra
 -- Date: 02/09/2025
--- Description: Demonstrate TOP and OFFSET-FETCH--
+-- Description: Demonstrate TOP and OFFSET-FETCH
 --
 USE AdventureWorks2022;
 SELECT   FirstName,
