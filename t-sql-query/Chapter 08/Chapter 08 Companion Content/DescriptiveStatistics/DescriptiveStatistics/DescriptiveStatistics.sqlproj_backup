@@ -66,14 +66,4 @@
   <ItemGroup>
     <Compile Include="DescriptiveStatistics.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <PackageReference Include="Microsoft.NETFramework.ReferenceAssemblies" Condition="'$(NetCoreBuild)' == 'true'">
-      <Version>1.0.0</Version>
-      <PrivateAssets>All</PrivateAssets>
-    </PackageReference>
-  </ItemGroup>
-  <Import Project="$(NETCoreTargetsPath)\Microsoft.Data.Tools.Schema.SqlTasks.targets" Condition="'$(NetCoreBuild)' == 'true'" />
-  <Target Name="BeforeBuild">
-    <Delete Files="$(BaseIntermediateOutputPath)\project.assets.json" />
-  </Target>
 </Project>

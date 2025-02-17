@@ -270,3 +270,5 @@ SELECT * FROM TSQLV6.Sales.OrderDetails WHERE orderid = 11078;
 SELECT * FROM TSQLV6.Sales.Customers;
 --
 SELECT CAST ('2022-02-12' AS date)
+--
+
