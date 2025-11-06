@@ -1,0 +1,13 @@
+USE AdventureWorks2019
+GO
+--
+EXEC sp_help 'Person.Person'
+GO
+--
+EXEC sp_columns 'Person.Person'
+GO
+--
+SELECT COLUMN_NAME, DATA_TYPE, CHARACTER_MAXIMUM_LENGTH, IS_NULLABLE
+FROM INFORMATION_SCHEMA.COLUMNS
+WHERE TABLE_NAME = 'Person' AND TABLE_SCHEMA = 'Person';
+--
